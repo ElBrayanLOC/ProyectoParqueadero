@@ -72,7 +72,6 @@ public class GestorParqueaderoBD {
     }
     public ArrayList<Reporte> verReporte(String prmPlaca) throws ClassNotFoundException, SQLException{
         String sql = "select count(*) as cantidad, extract (week from ingfechaingreso) as fecha,vehplaca as placa from ingreso where extract (week from ingfechaingreso) between extract (week from current_date)-3 and extract (week from current_date) and vehplaca= '"+prmPlaca+"' group by fecha,placa order by fecha";
-        System.out.println(sql);
         conector.conectarse();
         conector.crearConsulta(sql);
         ArrayList<Reporte> listare = new ArrayList();
