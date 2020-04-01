@@ -5,8 +5,14 @@
  */
 package negocio;
 
+import java.util.Date;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 /**
  *
@@ -44,7 +50,8 @@ public class GestorVehPersonaBD {
         conector.actualizar(sql2);
         conector.desconectarse();
     }
-    public void registrarAsociacion(int prmId, int prmCodCarnet, String prmPlacaVeh) throws ClassNotFoundException, SQLException{
+
+    public void registrarAsociacion(int prmId, int prmCodCarnet, String prmPlacaVeh) throws ClassNotFoundException, SQLException {
         String sql;
         conector.conectarse();
         sql = "INSERT INTO asocia (peridentificacion, usucodcarne, vehplaca)"
@@ -120,8 +127,8 @@ public class GestorVehPersonaBD {
     public ArrayList<Vehiculo> buscarVehiculo(int documento) throws ClassNotFoundException, SQLException {
         conector.conectarse();
         conector.crearConsulta("select usu.peridentificacion, usu.usucodcarne, v.vehplaca, v.vehmarca, v.vehtipo from vehiculo v"
-                + "inner join asocia aso on v.vehplaca = aso.vehplaca"
-                + "inner join usuario usu on usu.peridentificacion = aso.peridentificacion"
+                + " inner join asocia aso on v.vehplaca = aso.vehplaca "
+                + "inner join usuario usu on usu.peridentificacion = aso.peridentificacion "
                 + "where usu.peridentificacion =" + documento + " or usu.usucodcarne=" + documento);
 
         ArrayList<Vehiculo> vehiculos = new ArrayList();
@@ -131,6 +138,17 @@ public class GestorVehPersonaBD {
         }
         conector.desconectarse();
         return vehiculos;
+    }
+    public ArrayList<Multa> verMultas(String prmPlaca) throws ClassNotFoundException, SQLException{
+        conector.conectarse();
+        conector.crearConsulta("SELECT * FROM multa where vehplaca = '" + prmPlaca + "'");
+        ArrayList<Multa> multas = new ArrayList();
+        while(conector.getResultado().next()){
+            Multa multa = new Multa(conector.getResultado().getString("vehplaca"), conector.getResultado().getString("muldescripcion"), conector.getResultado().getString("mulfecha"), conector.getResultado().getString("mulfoto"));
+            multas.add(multa);
+        }
+        conector.desconectarse();
+        return multas;
     }
 
     public Vehiculo buscarVehPlaca(String placa) throws ClassNotFoundException, SQLException {
@@ -145,5 +163,27 @@ public class GestorVehPersonaBD {
         }
         conector.desconectarse();
         return veh;
+    }
+
+    public void regMultaVehiculo(Multa objMulta) throws ClassNotFoundException, SQLException, ParseException {
+        String sql;
+        Date fecha;
+        String placa = objMulta.getVehPlaca();
+        String descripcion = objMulta.getMulDescripcion();
+        String fechaMulta = objMulta.getMulFecha();
+        SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        fecha = date.parse(fechaMulta);
+        String ruta = objMulta.getMulFoto();
+        sql = "INSERT INTO multa(vehplaca, muldescripcion, mulfecha, mulfoto)"
+                + " VALUES ("
+                + "'" + placa + "',"
+                + "'" + descripcion + "',"
+                + "'" + fecha + "',"
+                + "'" + ruta + "'"
+                + ")";
+        conector.conectarse();
+        conector.actualizar(sql);
+        
+        conector.desconectarse();
     }
 }

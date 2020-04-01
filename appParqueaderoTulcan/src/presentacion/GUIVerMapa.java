@@ -4,22 +4,55 @@ import Utilidades.Utilidades;
 import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import javax.swing.JButton;
+import java.util.concurrent.Semaphore;
 import javax.swing.JOptionPane;
+import javax.swing.Timer;
 import negocio.Bahia;
 import negocio.GestorParqueadero;
 import negocio.Ingreso;
 
 public class GUIVerMapa extends javax.swing.JInternalFrame implements ActionListener {
+
     private final GestorParqueadero gestorIngreso = new GestorParqueadero();
     private ArrayList<javax.swing.JButton> misBotones;
     private String placa;
     private int modVision;
+    private Semaphore semaphore = new Semaphore(1);
+    //public void recargarMapa() {
+    Thread t1 = new Thread() {
+        @Override
+        public void run() {
+            int segundos = 0;
+            try {
+                while (true) {
+                    System.out.println("Segundos: " + segundos);
+                    Thread.sleep(1000);
+                    segundos++;
+                    if (segundos >= 3) {
+                        cargarMapa();
+                        System.out.println("Mapa Recargado");
+                        segundos = 0;
+                    }
+                }
+            } catch (Exception e) {
+                System.out.println("Se salio Exception");
+            }
+            System.out.println("Se salio del hilo while");
+            segundos = 0;
+            run();
+        }
+    };
 
-    public GUIVerMapa(int modoVision, String prmPlaca) {
+    //}
+    public GUIVerMapa() {
+    }
+
+    public GUIVerMapa(int modoVision, String prmPlaca) throws InterruptedException {
         misBotones = new ArrayList<javax.swing.JButton>();
         placa = prmPlaca;
         modVision = modoVision;
@@ -31,31 +64,28 @@ public class GUIVerMapa extends javax.swing.JInternalFrame implements ActionList
             for (int i = 0; i < misBotones.size(); i++) {
                 misBotones.get(i).setEnabled(false);
             }
+            t1.start();
         }
     }
 
     private void regIngreso(int bahId) {
         String confirmacion;
-        Calendar fecha = new GregorianCalendar();
-        int año = fecha.get(Calendar.YEAR);
-        int mes = fecha.get(Calendar.MONTH);
-        int dia = fecha.get(Calendar.DAY_OF_MONTH);
-        String fechaEntrada = Integer.toString(año) + "/" + Integer.toString(mes) + "/" + Integer.toString(dia);
+        java.util.Date now = new java.util.Date(System.currentTimeMillis());
+        SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat hour = new SimpleDateFormat("HH:mm:ss");
+        String fechaEntrada = date.format(now) + " " + hour.format(now);
         Ingreso ing = new Ingreso(placa, Integer.toString(bahId), fechaEntrada, null);
         confirmacion = gestorIngreso.registrarIngreso(placa, Integer.toString(bahId), fechaEntrada, fechaEntrada);
         Utilidades.mensajeExito(confirmacion, "Registro Exitoso.");
         this.dispose();
-
     }
 
     private void regSalida(int BahId) {
         String confirmacion;
-        Calendar fecha = new GregorianCalendar();
-        int año = fecha.get(Calendar.YEAR);
-        int mes = fecha.get(Calendar.MONTH);
-        int dia = fecha.get(Calendar.DAY_OF_MONTH);
-        String fechaSalida = Integer.toString(año) + "/" + Integer.toString(mes) + "/" + Integer.toString(dia);
-
+        java.util.Date now = new java.util.Date(System.currentTimeMillis());
+        SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat hour = new SimpleDateFormat("HH:mm:ss");
+        String fechaSalida = date.format(now) + " " + hour.format(now);
         confirmacion = gestorIngreso.registrarSalida(BahId, fechaSalida);
         Utilidades.mensajeExito(confirmacion, "Salida Confirmada.");
     }
@@ -72,14 +102,14 @@ public class GUIVerMapa extends javax.swing.JInternalFrame implements ActionList
                         if (misBotones.get(i).getBackground() == Color.YELLOW) {
                             Utilidades.mensajeAdvertencia("Bahia Ocupada", "Advertencia");
                         } else {
-                            bahId = i+1;
+                            bahId = i + 1;
                             misBotones.get(i).setBackground(Color.YELLOW);
                         }
                         break;
-                } 
-                    
+                    }
+
                 }
-                
+
             }
         } else if (getModoVision() == 2) {
             opc = JOptionPane.showConfirmDialog(null, "Desea liberar la Bahia", "Confirmar", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -89,24 +119,22 @@ public class GUIVerMapa extends javax.swing.JInternalFrame implements ActionList
                         if (misBotones.get(i).getBackground() == Color.GREEN) {
                             Utilidades.mensajeAdvertencia("Bahia libre", "Advertencia");
                         } else {
-                            bahId = i+1;
+                            bahId = i + 1;
                             System.out.println("presentacion.GUIVerMapa.actionPerformed()");
                             misBotones.get(i).setBackground(Color.GREEN);
                         }
                         break;
-                } 
-                    
+                    }
                 }
-               
             }
         }
-         if (getModoVision() == 1) {
+        if (getModoVision() == 1) {
             regIngreso(bahId);
-            
+
         } else if (getModoVision() == 2) {
             regSalida(bahId);
         }
-       
+
     }
 
     private void addActionListener() {
@@ -196,7 +224,7 @@ public class GUIVerMapa extends javax.swing.JInternalFrame implements ActionList
         misBotones.add(btnIng36);
     }
 
-    private void cargarMapa() {
+    private void cargarMapa() throws InterruptedException {
         ArrayList<Bahia> bahias = null;
         bahias = gestorIngreso.Buscar_Bahias();
 
@@ -260,6 +288,23 @@ public class GUIVerMapa extends javax.swing.JInternalFrame implements ActionList
 
         setClosable(true);
         setIconifiable(true);
+        addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
+            public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameClosed(javax.swing.event.InternalFrameEvent evt) {
+                formInternalFrameClosed(evt);
+            }
+            public void internalFrameClosing(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameIconified(javax.swing.event.InternalFrameEvent evt) {
+            }
+            public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
+            }
+        });
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.LINE_AXIS));
 
         pnlMapa.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -379,6 +424,12 @@ public class GUIVerMapa extends javax.swing.JInternalFrame implements ActionList
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formInternalFrameClosed(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosed
+        if (modVision == 0) {
+            t1.stop();
+        }
+    }//GEN-LAST:event_formInternalFrameClosed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

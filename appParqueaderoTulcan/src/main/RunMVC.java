@@ -10,8 +10,8 @@ import negocio.GestorUsuario;
 import presentacion.GUIAutenticacion;
 import presentacion.GUIAutenticacionController;
 import presentacion.GUIInicio;
-import presentacion.GUIBuscarVehPersona;
-//import presentacion.GUIBuscarVehPersonaController;
+import mvcf.AModel;
+import mvcf.AView;
 /**
  *
  * @author jhayber
@@ -31,11 +31,5 @@ public class RunMVC {
         
         myView.obtenerBoton().addActionListener(myController);
         myView.obtenerBoton().setActionCommand("iniciar"); 
-        
-//        //Agregar Usuario
-//        GestorVehiculoPersona gestorV = new GestorVehiculoPersona();
-//        GUIBuscarVehPersona vistaB = new GUIBuscarVehPersona();
-//        gestorV.addObserver(vistaB);
-//        gestor.notifyAll();
     }
 }

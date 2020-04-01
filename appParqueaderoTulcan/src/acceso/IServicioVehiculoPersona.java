@@ -5,6 +5,7 @@
  */
 package acceso;
 
+import negocio.Multa;
 import negocio.Persona;
 import negocio.Vehiculo;
 

@@ -12,7 +12,9 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import negocio.Ingreso;
+import negocio.Multa;
 import negocio.Persona;
+import negocio.Reporte;
 import negocio.Vehiculo;
 import negocio.Vigilante;
 
@@ -20,7 +22,7 @@ import negocio.Vigilante;
  *
  * @author jhayber
  */
-public class ServicioServidor implements IServicioUsuario, IServicioVehiculoPersona, IServicioIngreso {
+public class ServicioServidor implements IServicioUsuario, IServicioVehiculoPersona, IServicioIngreso, IServicioMulta {
 
     private final String IP_SERVIDOR = "localhost";
     private PrintStream salidaDecorada;
@@ -186,6 +188,21 @@ public class ServicioServidor implements IServicioUsuario, IServicioVehiculoPers
     }
 
     @Override
+    public String reporteIngreso() {
+        String respuesta = null;
+        String accion = "reporteIngreso";
+        try {
+            conectar(IP_SERVIDOR, PUERTO);
+            respuesta = leerFlujoEntradaSalida(accion);
+            cerrarFlujos();
+            desconectar();
+        } catch (IOException ex) {
+            Logger.getLogger(ServicioServidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return respuesta;
+    }
+
+    @Override
     public String registrarIngreso(String prmPlaca, String bahId, String fechaEntrada, String fechaSalida) {
         String respuesta = null;
         String accion = "regIngreso";
@@ -294,14 +311,62 @@ public class ServicioServidor implements IServicioUsuario, IServicioVehiculoPers
 
         return respuesta;
     }
+
     @Override
-    public String registrarAsociacion(int prmIdentificacion, int prmCodCarne, String prmPlaca){
+    public String registrarAsociacion(int prmIdentificacion, int prmCodCarne, String prmPlaca) {
         String respuesta = null;
         String accion = "asociarVehiculo";
         String informacionCliente = prmIdentificacion + "," + prmCodCarne + "," + prmPlaca;
         try {
             conectar(IP_SERVIDOR, PUERTO);
             respuesta = leerFlujoEntradaSalida(accion + "," + informacionCliente);
+            cerrarFlujos();
+            desconectar();
+        } catch (IOException ex) {
+            Logger.getLogger(ServicioServidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return respuesta;
+    }
+
+    @Override
+    public String regMultaVehiculo(Multa objMulta) {
+        String respuesta = null;
+        String accion = "registrarMulta";
+        String informacionMulta = objMulta.getVehPlaca() + "," + objMulta.getMulDescripcion() + "," + objMulta.getMulFecha() + "," + objMulta.getMulFoto();
+        try {
+            conectar(IP_SERVIDOR, PUERTO);
+            respuesta = leerFlujoEntradaSalida(accion + "," + informacionMulta);
+            cerrarFlujos();
+            desconectar();
+        } catch (IOException ex) {
+            Logger.getLogger(ServicioServidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return respuesta;
+    }
+
+    @Override
+    public String verMultas(String prmPlaca) {
+        String respuesta = null;
+        String accion = "verMultas";
+        String informacionMulta = prmPlaca;
+        try {
+            conectar(IP_SERVIDOR, PUERTO);
+            respuesta = leerFlujoEntradaSalida(accion + "," + informacionMulta);
+            cerrarFlujos();
+            desconectar();
+        } catch (IOException ex) {
+            Logger.getLogger(ServicioServidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return respuesta;
+    }
+     @Override
+    public String reporteIngresoVeh(String prmPlaca){
+        String respuesta = null;
+        String accion = "reporteIngresoVeh";
+        String inforeporteIngreso = prmPlaca;
+        try {
+            conectar(IP_SERVIDOR, PUERTO);
+            respuesta = leerFlujoEntradaSalida(accion + "," + inforeporteIngreso);
             cerrarFlujos();
             desconectar();
         } catch (IOException ex) {

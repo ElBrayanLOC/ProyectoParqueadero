@@ -7,18 +7,30 @@ package presentacion;
 
 import Clases.fondoEscritorio;
 import java.beans.PropertyVetoException;
+import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import mvcf.AModel;
 import mvcf.AView;
+import negocio.Conexion;
+import negocio.GestorParqueadero;
 import negocio.Persona;
+import negocio.Reporte;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
  * @author jhayber
  */
-public class GUIInicio extends javax.swing.JFrame{
+public class GUIInicio extends javax.swing.JFrame {
 
     private String usuario;
 
@@ -54,7 +66,6 @@ public class GUIInicio extends javax.swing.JFrame{
         mnuReportes = new javax.swing.JMenu();
         mnuRegMulta = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
         mnuMapa = new javax.swing.JMenu();
         mnuVerMapa = new javax.swing.JMenuItem();
         mnuNomUsuario = new javax.swing.JMenu();
@@ -63,7 +74,6 @@ public class GUIInicio extends javax.swing.JFrame{
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         dskEscritorio.setBackground(new java.awt.Color(153, 153, 255));
-        dskEscritorio.setLayout(new java.awt.BorderLayout());
 
         mnuOpciones.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/ajustes.png"))); // NOI18N
         mnuOpciones.setText("Opciones");
@@ -120,15 +130,21 @@ public class GUIInicio extends javax.swing.JFrame{
 
         mnuRegMulta.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/multa.png"))); // NOI18N
         mnuRegMulta.setText("Registrar Multa");
+        mnuRegMulta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuRegMultaActionPerformed(evt);
+            }
+        });
         mnuReportes.add(mnuRegMulta);
 
         jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/crecimiento.png"))); // NOI18N
         jMenuItem2.setText("Reporte Ingreso");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
         mnuReportes.add(jMenuItem2);
-
-        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/reporte.png"))); // NOI18N
-        jMenuItem1.setText("Reporte Congestión");
-        mnuReportes.add(jMenuItem1);
 
         jMenuBar2.add(mnuReportes);
 
@@ -161,7 +177,7 @@ public class GUIInicio extends javax.swing.JFrame{
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(dskEscritorio, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
+            .addComponent(dskEscritorio, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
         );
 
         pack();
@@ -184,7 +200,12 @@ public class GUIInicio extends javax.swing.JFrame{
     }//GEN-LAST:event_mnuRegIngresoActionPerformed
 
     private void mnuVerMapaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuVerMapaActionPerformed
-        GUIVerMapa objMapa = new GUIVerMapa(0, "-1");
+        GUIVerMapa objMapa = null;
+        try {
+            objMapa = new GUIVerMapa(0, "-1");
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GUIInicio.class.getName()).log(Level.SEVERE, null, ex);
+        }
         //objMapa.setMaximizable(true);
         dskEscritorio.add(objMapa);
         try {
@@ -196,7 +217,17 @@ public class GUIInicio extends javax.swing.JFrame{
     }//GEN-LAST:event_mnuVerMapaActionPerformed
 
     private void mnuRegSalidaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRegSalidaActionPerformed
-        GUIVerMapa objMapa = new GUIVerMapa(2, "-1");
+        GUIVerMapa objMapa = null;
+        try {
+            objMapa = new GUIVerMapa(2, "-1");
+        } catch (InterruptedException ex) {
+            //Logger.getLogger(GUIInicio.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                objMapa = new GUIVerMapa(2, "-1");
+            } catch (InterruptedException ex1) {
+                Logger.getLogger(GUIInicio.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
         //objMapa.setMaximizable(true);
         dskEscritorio.add(objMapa);
         try {
@@ -238,11 +269,54 @@ public class GUIInicio extends javax.swing.JFrame{
         objVehPersona.show();
     }//GEN-LAST:event_mnuAsociarVehActionPerformed
 
+    private void mnuRegMultaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuRegMultaActionPerformed
+        // TODO add your handling code here:
+        GUIRegistrarMulta objMulta = new GUIRegistrarMulta();
+        objMulta.setMaximizable(true);
+        dskEscritorio.add(objMulta);
+        try {
+            objMulta.setMaximum(false);
+        } catch (PropertyVetoException ex) {
+            Logger.getLogger(GUIInicio.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        objMulta.show();
+    }//GEN-LAST:event_mnuRegMultaActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        GestorParqueadero objParqueadero = new GestorParqueadero();
+        ArrayList<Reporte> listaReportes = null;
+        try {
+            listaReportes = objParqueadero.reporteIngreso();
+            if (!listaReportes.equals("No se encontro reportes.")) {
+                Conexion con = new Conexion();
+                Connection conn = con.getConecion();
+                try {
+                    JasperReport reporte;
+                    String path = "C:\\Users\\Personal\\Documents\\NetBeansProjects\\appProyectoFinal\\appParqueaderoTulcan\\src\\reporte\\IReportIngreso.jasper";
+                    reporte = (JasperReport) JRLoader.loadObjectFromFile(path); //Se carga el reporte de su localizacion
+                    JasperPrint jprint = JasperFillManager.fillReport(reporte, null, conn); //Agregamos los parametros para llenar el reporte
+                    JasperViewer viewer = new JasperViewer(jprint, false); //Se crea la vista del reportes
+                    viewer.setDefaultCloseOperation(DISPOSE_ON_CLOSE); // Se declara con dispose_on_close para que no se cierre el programa cuando se cierre el reporte
+                    viewer.setVisible(true); //Se vizualiza el reporte
+
+                } catch (JRException ex) {
+                    Logger.getLogger(GUIInicio.class.getName()).log(Level.SEVERE, null, ex);
+                    Utilidades.Utilidades.mensajeError(ex.getMessage(), "Error");
+                }
+            } else {
+                Utilidades.Utilidades.mensajeError("No existen datos", "Error");
+            }
+        } catch (Exception ex) {
+            Utilidades.Utilidades.mensajeError(ex.getMessage(), "Error");
+        }
+
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public static javax.swing.JDesktopPane dskEscritorio;
     private javax.swing.JMenuBar jMenuBar2;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem mnuAsociarVeh;
     private javax.swing.JMenu mnuMapa;
@@ -256,6 +330,5 @@ public class GUIInicio extends javax.swing.JFrame{
     private javax.swing.JMenuItem mnuSalir;
     private javax.swing.JMenuItem mnuVerMapa;
     // End of variables declaration//GEN-END:variables
-
 
 }

@@ -25,7 +25,7 @@ public class testIngresoPersona {
     }
     
     @Test
-    public void testIngreso(){
+    public void testIngreso() throws InterruptedException{
         /*
         1) Se verifica que la persona a ingresar este en la BD
         */

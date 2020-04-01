@@ -6,8 +6,6 @@
 package mainServidor;
 
 import java.sql.SQLException;
-import negocio.Persona;
-import negocio.conectorJDBC;
 import servicio.servicioDB;
 
 /**

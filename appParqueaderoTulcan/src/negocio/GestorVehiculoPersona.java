@@ -5,12 +5,12 @@
  */
 package negocio;
 
+import acceso.IServicioMulta;
 import acceso.IServicioVehiculoPersona;
 import acceso.ServicioServidor;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Properties;
-import mvcf.AModel;
 import acceso.IServicioUsuario;
 import java.util.Observable;
 
@@ -18,18 +18,22 @@ import java.util.Observable;
  *
  * @author jhayber
  */
-public class GestorVehiculoPersona extends Observable {
+public class GestorVehiculoPersona {
 
     private final IServicioVehiculoPersona servicioVehPersona;
+    private final IServicioMulta servicioMulta;
     private Persona persona;
+    private ArrayList<Multa> listaMultas;
     private Vehiculo vehiculo;
     private ArrayList<Vehiculo> listaVehiculos;
     private String respuesta;
 
     public GestorVehiculoPersona() {
         servicioVehPersona = new ServicioServidor();
+        servicioMulta = new ServicioServidor();
         persona = new Persona();
         vehiculo = new Vehiculo();
+        listaMultas = new ArrayList<>();
         listaVehiculos = new ArrayList<>();
         respuesta = null;
     }
@@ -37,7 +41,6 @@ public class GestorVehiculoPersona extends Observable {
     public String registrarConductor(Persona prmPersona) {
         String json = servicioVehPersona.registrarPersona(prmPersona);
         respuesta = json;
-        setChanged();
         return json;
     }
 
@@ -81,24 +84,41 @@ public class GestorVehiculoPersona extends Observable {
         }
         return null;
     }
-    
-    public Vehiculo buscarVehPlaca (String prmPlaca){
-        String arrayJson = servicioVehPersona.buscarVehPlaca(prmPlaca);
-        if (!arrayJson.equals("No se encontro vehiculo.")){
-            vehiculo = parseToVehiculo(arrayJson);
-            return vehiculo;
-        }else{
+
+    public ArrayList<Multa> verMultas(String prmMulta) {
+        String arrayJson = servicioMulta.verMultas(prmMulta);
+        if (!arrayJson.equals("No se encontro multas.")) {
+            ArrayList<Multa> misMultas = parseToMulta(arrayJson);
+            return misMultas;
+        } else {
             respuesta = arrayJson;
         }
         return null;
     }
-    
-    public String registrarAsociacion(int prmIdentificacion, int prmCodCarne, String prmPlaca){
+
+    public Vehiculo buscarVehPlaca(String prmPlaca) {
+        String arrayJson = servicioVehPersona.buscarVehPlaca(prmPlaca);
+        if (!arrayJson.equals("No se encontro vehiculo.")) {
+            vehiculo = parseToVehiculo(arrayJson);
+            return vehiculo;
+        } else {
+            respuesta = arrayJson;
+        }
+        return null;
+    }
+
+    public String registrarAsociacion(int prmIdentificacion, int prmCodCarne, String prmPlaca) {
         String json = servicioVehPersona.registrarAsociacion(prmIdentificacion, prmCodCarne, prmPlaca);
         respuesta = json;
         return json;
     }
-    
+
+    public String regMultaVehiculo(Multa prmMulta) {
+        String arrayJson = servicioMulta.regMultaVehiculo(prmMulta);
+        respuesta = arrayJson;
+        return respuesta;
+    }
+
     private ArrayList<Vehiculo> deserializarMisVehiculos(String prmArrayJson) {
         Vehiculo[] misVehiculos = new Gson().fromJson(prmArrayJson, Vehiculo[].class);
         ArrayList<Vehiculo> listVehiculos = new ArrayList<>();
@@ -108,6 +128,17 @@ public class GestorVehiculoPersona extends Observable {
         }
         listaVehiculos = listVehiculos;
         return listVehiculos;
+    }
+
+    private ArrayList<Multa> parseToMulta(String prmArrayJson) {
+        Multa[] misMultas = new Gson().fromJson(prmArrayJson, Multa[].class);
+        ArrayList<Multa> listMultas = new ArrayList<>();
+        for (int i = 0; i < misMultas.length; i++) {
+            Multa mul = misMultas[i];
+            listMultas.add(mul);
+        }
+        listaMultas = listMultas;
+        return listMultas;
     }
 
     private Persona parseToPersona(String json) {
@@ -122,7 +153,7 @@ public class GestorVehiculoPersona extends Observable {
         persona.setPerRol(properties.getProperty("perRol"));
         return persona;
     }
-    
+
     private Vehiculo parseToVehiculo(String json) {
         Gson gson = new Gson();
         Properties properties = gson.fromJson(json, Properties.class);

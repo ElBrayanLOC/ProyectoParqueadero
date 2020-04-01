@@ -16,11 +16,13 @@ import negocio.Vigilante;
  */
 public class GUIRegistrarVigilante extends javax.swing.JInternalFrame {
 
+    private int cont;
     private String identificacion, nombre, apellido, genero, fechaNacimiento, empresa, usuario, contrasenia;
     private final GestorUsuario gestorVigilante = new GestorUsuario();
 
     public GUIRegistrarVigilante() {
         initComponents();
+        mostrarLabel();
     }
 
     /**
@@ -33,75 +35,86 @@ public class GUIRegistrarVigilante extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         pnlPrincipal = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        lbRegConductor = new javax.swing.JLabel();
         lbIdentificacion = new javax.swing.JLabel();
         txtId = new javax.swing.JTextField();
+        lbvid = new javax.swing.JLabel();
         lbNombres = new javax.swing.JLabel();
         txtNombres = new javax.swing.JTextField();
+        lbvNom = new javax.swing.JLabel();
         lbApellidos = new javax.swing.JLabel();
         txtApellidos = new javax.swing.JTextField();
+        lbvApe = new javax.swing.JLabel();
         lbGenero = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         rbFemenino = new javax.swing.JRadioButton();
         rbMasculino = new javax.swing.JRadioButton();
         rbOtro = new javax.swing.JRadioButton();
+        lbvfec2 = new javax.swing.JLabel();
         lbFecNacimiento = new javax.swing.JLabel();
         rSDateCalendar = new com.toedter.calendar.JDateChooser();
+        lbvfec = new javax.swing.JLabel();
         lbEmpresa = new javax.swing.JLabel();
         txtEmpresa = new javax.swing.JTextField();
+        lbvemp = new javax.swing.JLabel();
         lblUsuario = new javax.swing.JLabel();
         txtUsuario = new javax.swing.JTextField();
+        lbvusu = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtContrasenia = new javax.swing.JTextField();
+        lbvcontra = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         btnRegVigilante = new javax.swing.JButton();
 
+        setBackground(new java.awt.Color(255, 255, 255));
         setClosable(true);
+        setTitle("Registrar Vigilante");
 
-        pnlPrincipal.setBackground(new java.awt.Color(204, 204, 204));
-        pnlPrincipal.setLayout(new java.awt.GridLayout(19, 1));
-
-        jPanel4.setBackground(new java.awt.Color(51, 153, 255));
-        jPanel4.setLayout(new java.awt.GridLayout(1, 1));
-
-        lbRegConductor.setBackground(new java.awt.Color(0, 153, 255));
-        lbRegConductor.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        lbRegConductor.setForeground(new java.awt.Color(255, 255, 255));
-        lbRegConductor.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbRegConductor.setText("Registro de Vigilante");
-        jPanel4.add(lbRegConductor);
-
-        pnlPrincipal.add(jPanel4);
+        pnlPrincipal.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.light"));
+        pnlPrincipal.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Registro de Vigilante UNICAUCA", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tw Cen MT Condensed", 1, 14))); // NOI18N
+        pnlPrincipal.setLayout(new java.awt.GridLayout(9, 3));
 
         lbIdentificacion.setBackground(new java.awt.Color(204, 204, 255));
         lbIdentificacion.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        lbIdentificacion.setText("Identificación");
+        lbIdentificacion.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbIdentificacion.setText("Identificación: ");
         pnlPrincipal.add(lbIdentificacion);
-
-        txtId.setText("2");
         pnlPrincipal.add(txtId);
 
-        lbNombres.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        lbNombres.setText("Nombres");
-        pnlPrincipal.add(lbNombres);
+        lbvid.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvid.setForeground(new java.awt.Color(255, 0, 0));
+        lbvid.setText("Requerido");
+        pnlPrincipal.add(lbvid);
 
-        txtNombres.setText("Andres");
+        lbNombres.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        lbNombres.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbNombres.setText("Nombres: ");
+        pnlPrincipal.add(lbNombres);
         pnlPrincipal.add(txtNombres);
 
-        lbApellidos.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        lbApellidos.setText("Apellidos");
-        pnlPrincipal.add(lbApellidos);
+        lbvNom.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvNom.setForeground(new java.awt.Color(255, 0, 0));
+        lbvNom.setText("Requerido");
+        pnlPrincipal.add(lbvNom);
 
-        txtApellidos.setText("Lopez");
+        lbApellidos.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        lbApellidos.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbApellidos.setText("Apellidos: ");
+        pnlPrincipal.add(lbApellidos);
         pnlPrincipal.add(txtApellidos);
 
+        lbvApe.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvApe.setForeground(new java.awt.Color(255, 0, 0));
+        lbvApe.setText("Requerido");
+        pnlPrincipal.add(lbvApe);
+
         lbGenero.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        lbGenero.setText("Genero");
+        lbGenero.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbGenero.setText("Genero: ");
         pnlPrincipal.add(lbGenero);
 
         jPanel2.setLayout(new java.awt.GridLayout(1, 3));
 
+        rbFemenino.setSelected(true);
         rbFemenino.setText("Femenino");
         jPanel2.add(rbFemenino);
 
@@ -113,28 +126,53 @@ public class GUIRegistrarVigilante extends javax.swing.JInternalFrame {
 
         pnlPrincipal.add(jPanel2);
 
+        lbvfec2.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvfec2.setForeground(new java.awt.Color(255, 0, 0));
+        pnlPrincipal.add(lbvfec2);
+
         lbFecNacimiento.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        lbFecNacimiento.setText("Fecha de Nacimiento");
+        lbFecNacimiento.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbFecNacimiento.setText("Fecha de Nacimiento: ");
         pnlPrincipal.add(lbFecNacimiento);
         pnlPrincipal.add(rSDateCalendar);
 
-        lbEmpresa.setText("Empresa");
-        pnlPrincipal.add(lbEmpresa);
+        lbvfec.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvfec.setForeground(new java.awt.Color(255, 0, 0));
+        lbvfec.setText("Requerido");
+        pnlPrincipal.add(lbvfec);
 
-        txtEmpresa.setText("Limitada S.A");
+        lbEmpresa.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        lbEmpresa.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbEmpresa.setText("Empresa: ");
+        pnlPrincipal.add(lbEmpresa);
         pnlPrincipal.add(txtEmpresa);
 
-        lblUsuario.setText("Usuario");
-        pnlPrincipal.add(lblUsuario);
+        lbvemp.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvemp.setForeground(new java.awt.Color(255, 0, 0));
+        lbvemp.setText("Requerido");
+        pnlPrincipal.add(lbvemp);
 
-        txtUsuario.setText("alopez");
+        lblUsuario.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        lblUsuario.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblUsuario.setText("Usuario: ");
+        pnlPrincipal.add(lblUsuario);
         pnlPrincipal.add(txtUsuario);
 
-        jLabel2.setText("Contraseña");
-        pnlPrincipal.add(jLabel2);
+        lbvusu.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvusu.setForeground(new java.awt.Color(255, 0, 0));
+        lbvusu.setText("Requerido");
+        pnlPrincipal.add(lbvusu);
 
-        txtContrasenia.setText("123");
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel2.setText("Contraseña: ");
+        pnlPrincipal.add(jLabel2);
         pnlPrincipal.add(txtContrasenia);
+
+        lbvcontra.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvcontra.setForeground(new java.awt.Color(255, 0, 0));
+        lbvcontra.setText("Requerido");
+        pnlPrincipal.add(lbvcontra);
         pnlPrincipal.add(jLabel1);
 
         btnRegVigilante.setBackground(new java.awt.Color(204, 204, 255));
@@ -155,20 +193,23 @@ public class GUIRegistrarVigilante extends javax.swing.JInternalFrame {
     private void btnRegVigilanteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegVigilanteActionPerformed
         // TODO add your handling code here:
         String confirmacion;
-        String identificacion = getIdentificacion();
-        String nombreV = getNombre();
-        String apellidoV = getApellido();
-        String generoV = getGenero();
-        String fechaNacimientoV = getFechaNacimiento();
-        String empresaV = getEmpresa();
-        String usuarioV = getUsuario();
-        String contraseniaV = getContrasenia();
-        Vigilante vigilante = new Vigilante(identificacion, nombreV, apellidoV, generoV, fechaNacimientoV, empresaV, usuarioV, contraseniaV);
-        confirmacion = gestorVigilante.registrarVigilante(vigilante);
-        if (confirmacion.equals("Vigilante agregado con exito")) {
-            Utilidades.Utilidades.mensajeExito(confirmacion, "Registro Exitoso.");
-        } else {
-            Utilidades.Utilidades.mensajeError("Vigilante ya registrado", "Error.");
+        validarCampos();
+        if (getCont() == 0) {
+            String identificacion = getIdentificacion();
+            String nombreV = getNombre();
+            String apellidoV = getApellido();
+            String generoV = getGenero();
+            String fechaNacimientoV = getFechaNacimiento();
+            String empresaV = getEmpresa();
+            String usuarioV = getUsuario();
+            String contraseniaV = getContrasenia();
+            Vigilante vigilante = new Vigilante(identificacion, nombreV, apellidoV, generoV, fechaNacimientoV, empresaV, usuarioV, contraseniaV);
+            confirmacion = gestorVigilante.registrarVigilante(vigilante);
+            if (confirmacion.equals("Vigilante agregado con exito")) {
+                Utilidades.Utilidades.mensajeExito(confirmacion, "Registro Exitoso.");
+            } else {
+                Utilidades.Utilidades.mensajeError("Vigilante ya registrado", "Error.");
+            }
         }
     }//GEN-LAST:event_btnRegVigilanteActionPerformed
 
@@ -222,6 +263,10 @@ public class GUIRegistrarVigilante extends javax.swing.JInternalFrame {
         return fechaNacimiento;
     }
 
+    public int getCont() {
+        return cont;
+    }
+
     public void setFechaNacimiento(String fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
@@ -253,20 +298,81 @@ public class GUIRegistrarVigilante extends javax.swing.JInternalFrame {
         this.contrasenia = contrasenia;
     }
 
+    public void validarCampos() {
+        if (txtId.getText().equals("")) {
+            lbvid.setVisible(true);
+            cont++;
+        } else {
+            lbvid.setVisible(false);
+        }
+        if (getNombre().equals("")) {
+            lbvNom.setVisible(true);
+            cont++;
+        } else {
+            lbvNom.setVisible(false);
+        }
+        if (getApellido().equals("")) {
+            lbvApe.setVisible(true);
+            cont++;
+        } else {
+            lbvApe.setVisible(false);
+        }
+        if (rSDateCalendar.getDate() == null) {
+            lbvfec.setVisible(true);
+            cont++;
+        } else {
+            lbvfec.setVisible(false);
+        }
+        if (getEmpresa().equals("")) {
+            lbvemp.setVisible(true);
+            cont++;
+        } else {
+            lbvemp.setVisible(false);
+        }
+        if (getUsuario().equals("")) {
+            lbvusu.setVisible(true);
+            cont++;
+        } else {
+            lbvusu.setVisible(false);
+        }
+        if (getContrasenia().equals("")) {
+            lbvcontra.setVisible(true);
+            cont++;
+        } else {
+            lbvcontra.setVisible(false);
+        }
+    }
+
+    public void mostrarLabel() {
+        lbvid.setVisible(false);
+        lbvNom.setVisible(false);
+        lbvApe.setVisible(false);
+        lbvfec.setVisible(false);
+        lbvemp.setVisible(false);
+        lbvusu.setVisible(false);
+        lbvcontra.setVisible(false);
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRegVigilante;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JLabel lbApellidos;
     private javax.swing.JLabel lbEmpresa;
     private javax.swing.JLabel lbFecNacimiento;
     private javax.swing.JLabel lbGenero;
     private javax.swing.JLabel lbIdentificacion;
     private javax.swing.JLabel lbNombres;
-    private javax.swing.JLabel lbRegConductor;
     private javax.swing.JLabel lblUsuario;
+    private javax.swing.JLabel lbvApe;
+    private javax.swing.JLabel lbvNom;
+    private javax.swing.JLabel lbvcontra;
+    private javax.swing.JLabel lbvemp;
+    private javax.swing.JLabel lbvfec;
+    private javax.swing.JLabel lbvfec2;
+    private javax.swing.JLabel lbvid;
+    private javax.swing.JLabel lbvusu;
     private javax.swing.JPanel pnlPrincipal;
     private com.toedter.calendar.JDateChooser rSDateCalendar;
     private javax.swing.JRadioButton rbFemenino;

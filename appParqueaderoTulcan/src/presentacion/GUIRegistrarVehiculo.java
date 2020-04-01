@@ -14,8 +14,7 @@ import negocio.Vehiculo;
  */
 public class GUIRegistrarVehiculo extends javax.swing.JInternalFrame {
     private final GestorVehiculoPersona gestorVehiculo = new GestorVehiculoPersona();
-    private int idConductor;
-    private int codCarne;
+    private int idConductor, codCarne, cont;
     private String placaVehiculo, marca, tipoVehiculo;
     /**
      * Creates new form GUIRegPersona
@@ -23,11 +22,29 @@ public class GUIRegistrarVehiculo extends javax.swing.JInternalFrame {
     public GUIRegistrarVehiculo(int prmConductor, int prmCodCarne) {
         initComponents();
         setVisible(true);
+        mostrarLabel();
         idConductor = prmConductor;
         txtIdPropietario.setText(Integer.toString(idConductor));
         codCarne = prmCodCarne;
     }
-    
+    public void mostrarLabel(){
+        lbvmarca.setVisible(false);
+        lbvplaca.setVisible(false);
+    }
+    public void validarCampos(){
+        if(getMarca().equals("")){
+            lbvmarca.setVisible(true);
+            cont++;
+        }else{
+            lbvmarca.setVisible(false);
+        }
+        if(getPlaca().equals("")){
+            lbvplaca.setVisible(true);
+            cont++;
+        }else{
+            lbvplaca.setVisible(false);
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -39,35 +56,29 @@ public class GUIRegistrarVehiculo extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         pnlPrincipal = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        lbRegConductor = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         txtIdPropietario = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
         lbNroPlaca = new javax.swing.JLabel();
         txtPlaca = new javax.swing.JTextField();
-        lbMarca = new javax.swing.JLabel();
+        lbvplaca = new javax.swing.JLabel();
+        lbv = new javax.swing.JLabel();
         txtMarca = new javax.swing.JTextField();
+        lbvmarca = new javax.swing.JLabel();
         lbTipoVehiculo = new javax.swing.JLabel();
         cbTipoVehiculo = new javax.swing.JComboBox<>();
+        jLabel4 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         btnRegVehiculo = new javax.swing.JButton();
 
         setClosable(true);
+        setIconifiable(true);
+        setMaximizable(true);
+        setResizable(true);
 
-        pnlPrincipal.setBackground(new java.awt.Color(204, 204, 204));
-        pnlPrincipal.setLayout(new java.awt.GridLayout(11, 1));
-
-        jPanel4.setBackground(new java.awt.Color(51, 153, 255));
-        jPanel4.setLayout(new java.awt.GridLayout(1, 1));
-
-        lbRegConductor.setBackground(new java.awt.Color(0, 153, 255));
-        lbRegConductor.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        lbRegConductor.setForeground(new java.awt.Color(255, 255, 255));
-        lbRegConductor.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbRegConductor.setText("Registrar Vehiculo");
-        jPanel4.add(lbRegConductor);
-
-        pnlPrincipal.add(jPanel4);
+        pnlPrincipal.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.light"));
+        pnlPrincipal.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Registro de Vehiculos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tw Cen MT", 1, 14))); // NOI18N
+        pnlPrincipal.setLayout(new java.awt.GridLayout(5, 3));
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel2.setText("Identificacion Propietario");
@@ -76,6 +87,7 @@ public class GUIRegistrarVehiculo extends javax.swing.JInternalFrame {
         txtIdPropietario.setEditable(false);
         txtIdPropietario.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         pnlPrincipal.add(txtIdPropietario);
+        pnlPrincipal.add(jLabel3);
 
         lbNroPlaca.setBackground(new java.awt.Color(204, 204, 255));
         lbNroPlaca.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
@@ -83,10 +95,20 @@ public class GUIRegistrarVehiculo extends javax.swing.JInternalFrame {
         pnlPrincipal.add(lbNroPlaca);
         pnlPrincipal.add(txtPlaca);
 
-        lbMarca.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        lbMarca.setText("Marca");
-        pnlPrincipal.add(lbMarca);
+        lbvplaca.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvplaca.setForeground(new java.awt.Color(255, 0, 0));
+        lbvplaca.setText("Requerido");
+        pnlPrincipal.add(lbvplaca);
+
+        lbv.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        lbv.setText("Marca");
+        pnlPrincipal.add(lbv);
         pnlPrincipal.add(txtMarca);
+
+        lbvmarca.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvmarca.setForeground(new java.awt.Color(255, 0, 0));
+        lbvmarca.setText("Requerido");
+        pnlPrincipal.add(lbvmarca);
 
         lbTipoVehiculo.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         lbTipoVehiculo.setText("Tipo de Vehiculo");
@@ -94,6 +116,7 @@ public class GUIRegistrarVehiculo extends javax.swing.JInternalFrame {
 
         cbTipoVehiculo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Vehiculo", "Motocicleta" }));
         pnlPrincipal.add(cbTipoVehiculo);
+        pnlPrincipal.add(jLabel4);
         pnlPrincipal.add(jLabel1);
 
         btnRegVehiculo.setBackground(new java.awt.Color(204, 204, 255));
@@ -157,16 +180,21 @@ public class GUIRegistrarVehiculo extends javax.swing.JInternalFrame {
         }
         return tipoVehiculo;
     }
+    public int getCont(){
+        return cont;
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRegVehiculo;
     private javax.swing.JComboBox<String> cbTipoVehiculo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JLabel lbMarca;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel lbNroPlaca;
-    private javax.swing.JLabel lbRegConductor;
     private javax.swing.JLabel lbTipoVehiculo;
+    private javax.swing.JLabel lbv;
+    private javax.swing.JLabel lbvmarca;
+    private javax.swing.JLabel lbvplaca;
     private javax.swing.JPanel pnlPrincipal;
     private javax.swing.JTextField txtIdPropietario;
     private javax.swing.JTextField txtMarca;

@@ -13,6 +13,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -23,7 +24,9 @@ import negocio.GestorParqueaderoBD;
 import negocio.GestorUsuariosBD;
 import negocio.GestorVehPersonaBD;
 import negocio.Ingreso;
+import negocio.Multa;
 import negocio.Persona;
+import negocio.Reporte;
 import negocio.Vigilante;
 import negocio.Vehiculo;
 
@@ -98,6 +101,8 @@ public class servicioDB implements Runnable {
         } catch (ClassNotFoundException | SQLException ex) {
             Logger.getLogger(servicioDB.class
                     .getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(servicioDB.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -114,7 +119,7 @@ public class servicioDB implements Runnable {
     /**
      * Lee los flujos del Socket
      */
-    private void leerFlujos() throws ClassNotFoundException, SQLException {
+    private void leerFlujos() throws ClassNotFoundException, SQLException, ParseException {
         if (entradaDecorada.hasNextLine()) {
             //Extrae el flujo que envia el cliente
             String peticion = entradaDecorada.nextLine();
@@ -141,7 +146,7 @@ public class servicioDB implements Runnable {
      *
      * @param peticion petición completa al estilo "accion, informacion"
      */
-    private void decodificarPeticion(String peticion) throws ClassNotFoundException, SQLException {
+    private void decodificarPeticion(String peticion) throws ClassNotFoundException, SQLException, ParseException {
         StringTokenizer tokens = new StringTokenizer(peticion, ",");
         String parametros[] = new String[15];
 
@@ -153,7 +158,7 @@ public class servicioDB implements Runnable {
         procesarAccion(accion, parametros);
     }
 
-    private void procesarAccion(String accion, String parametros[]) throws ClassNotFoundException, SQLException {
+    private void procesarAccion(String accion, String parametros[]) throws ClassNotFoundException, SQLException, ParseException {
         /**
          * Atributos para usuario
          */
@@ -164,44 +169,61 @@ public class servicioDB implements Runnable {
         switch (accion) {
             case "Iniciar Sesion":
                 usuario = parametros[1];
-                miPersona = gestorUsuarios.IniciarSesion(usuario);
-                if (miPersona == null) {
-                    salidaDecorada.println("No se encontro a algun usuario con ese usuario.");
-                } else {
-                    JsonObject objJson = parseToJSONUsuarioS(miPersona);
-                    salidaDecorada.println(objJson.toString());
+                try {
+                    miPersona = gestorUsuarios.IniciarSesion(usuario);
+                    if (miPersona == null) {
+                        salidaDecorada.println("No se encontro a algun usuario con ese usuario.");
+                    } else {
+                        JsonObject objJson = parseToJSONUsuarioS(miPersona);
+                        salidaDecorada.println(objJson.toString());
+                    }
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
                 }
                 break;
             case "buscarDocumento":
                 cod = Integer.parseInt(parametros[1]);
-                System.out.println("Buscar documento: " + cod);
-                miPersona = gestorVehPersona.buscarUsuarioDocumento(cod);
-                if (miPersona == null) {
-                    salidaDecorada.println("No se encoontro Persona.");
-                } else {
-                    JsonObject objJson = parseToJSONPersona(miPersona);
-                    salidaDecorada.println(objJson.toString());
+                try {
+                    miPersona = gestorVehPersona.buscarUsuarioDocumento(cod);
+                    if (miPersona == null) {
+                        salidaDecorada.println("No se encoontro Persona.");
+                    } else {
+                        JsonObject objJson = parseToJSONPersona(miPersona);
+                        salidaDecorada.println(objJson.toString());
+                    }
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
                 }
                 break;
             case "buscarCodCarne":
                 cod = Integer.parseInt(parametros[1]);
                 System.out.println("Buscar documento: " + cod);
-                miPersona = gestorVehPersona.buscarUsuarioCarne(cod);
-                if (miPersona == null) {
-                    salidaDecorada.println("No se encoontro Persona.");
-                } else {
-                    JsonObject objJson = parseToJSONPersona(miPersona);
-                    salidaDecorada.println(objJson.toString());
+                try {
+                    miPersona = gestorVehPersona.buscarUsuarioCarne(cod);
+                    if (miPersona == null) {
+                        salidaDecorada.println("No se encoontro Persona.");
+                    } else {
+                        JsonObject objJson = parseToJSONPersona(miPersona);
+                        salidaDecorada.println(objJson.toString());
+                    }
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
                 }
+
                 break;
             case "vehiculo":
                 cod = Integer.parseInt(parametros[1]);
-                ArrayList<Vehiculo> objVehiculo = gestorVehPersona.buscarVehiculo(cod);
-                if (objVehiculo == null) {
-                    salidaDecorada.println("No se encontro Vehiculos.");
-                } else {
-                    salidaDecorada.println(serializarVehiculos(objVehiculo));
+                try {
+                    ArrayList<Vehiculo> objVehiculo = gestorVehPersona.buscarVehiculo(cod);
+                    if (objVehiculo == null) {
+                        salidaDecorada.println("No se encontro Vehiculos.");
+                    } else {
+                        salidaDecorada.println(serializarVehiculos(objVehiculo));
+                    }
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
                 }
+
                 break;
             case "registrarConductor":
                 Persona persona;
@@ -212,14 +234,19 @@ public class servicioDB implements Runnable {
                 String genero = parametros[5];
                 String fechaNac = parametros[6];
                 String rol = parametros[7];
-                persona = gestorVehPersona.buscarUsuarioDocumento(cod);
-                if (persona == null) {
-                    persona = new Persona(cod, codCarne, nombre, apellido, genero, fechaNac, rol);
-                    gestorVehPersona.registrarConductor(persona);
-                    salidaDecorada.println("Conductor agregado con exito");
-                } else {
-                    salidaDecorada.println("Conductor ya registrado");
+                try {
+                    persona = gestorVehPersona.buscarUsuarioDocumento(cod);
+                    if (persona == null) {
+                        persona = new Persona(cod, codCarne, nombre, apellido, genero, fechaNac, rol);
+                        gestorVehPersona.registrarConductor(persona);
+                        salidaDecorada.println("Conductor agregado con exito");
+                    } else {
+                        salidaDecorada.println("Conductor ya registrado");
+                    }
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
                 }
+
                 break;
             case "registrarVehiculo":
                 int idConductor = Integer.parseInt(parametros[1]);
@@ -227,55 +254,85 @@ public class servicioDB implements Runnable {
                 String placa = parametros[3];
                 String marca = parametros[4];
                 String tipoVehiculo = parametros[5];
-                Vehiculo vehi = gestorVehPersona.buscarVehPlaca(placa);
-                if (vehi == null) {
-                    Vehiculo veh = new Vehiculo(idConductor, usuCodCarne, placa, marca, tipoVehiculo);
-                    gestorVehPersona.registrarVehiculo(veh);
-                    salidaDecorada.println("Vehiculo agregado con exito");
-                } else {
-                    salidaDecorada.println("Vehiculo ya registrado");
+                try {
+                    Vehiculo vehi = gestorVehPersona.buscarVehPlaca(placa);
+                    if (vehi == null) {
+                        Vehiculo veh = new Vehiculo(idConductor, usuCodCarne, placa, marca, tipoVehiculo);
+                        gestorVehPersona.registrarVehiculo(veh);
+                        salidaDecorada.println("Vehiculo agregado con exito");
+                    } else {
+                        salidaDecorada.println("Vehiculo ya registrado");
+                    }
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
                 }
+
                 break;
             case "buscar_Bahias":
-                ArrayList<Bahia> miBahia = gestorParqueadero.buscarBahias();
+                try {
+                    ArrayList<Bahia> miBahia = gestorParqueadero.buscarBahias();
 
-                if (miBahia == null) {
-                    salidaDecorada.println("No se encoontro mapa.");
-                } else {
-                    salidaDecorada.println(serializarBahia(miBahia));
+                    if (miBahia == null) {
+                        salidaDecorada.println("No se encoontro mapa.");
+                    } else {
+                        salidaDecorada.println(serializarBahia(miBahia));
+                    }
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
                 }
+
                 break;
             case "regIngreso":
                 String vehPlaca = parametros[1];
                 String bahId = parametros[2];
                 String fecIngreso = parametros[3];
                 String fecSalida = parametros[4];
-                Ingreso ing = new Ingreso(vehPlaca, bahId, fecIngreso, fecSalida);
-                gestorParqueadero.registrarIngreso(ing);
-                salidaDecorada.println("Ingreso Registrado con exito");
+                try {
+                    Ingreso ing = new Ingreso(vehPlaca, bahId, fecIngreso, fecSalida);
+                    gestorParqueadero.registrarIngreso(ing);
+                    salidaDecorada.println("Ingreso Registrado con exito");
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
+                }
+
                 break;
             case "regSalida":
                 bahId = parametros[1];
                 fecSalida = parametros[2];
-                gestorParqueadero.registrarSalida(bahId, fecSalida);
-                salidaDecorada.println("Salida Confirmada");
+                try {
+                    gestorParqueadero.registrarSalida(bahId, fecSalida);
+                    salidaDecorada.println("Salida Confirmada");
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
+                }
                 break;
             case "buscarVigilante":
                 int codVi = Integer.parseInt(parametros[1]);
-                Vigilante vig = gestorUsuarios.buscarVigilante(codVi);
-                if (vig == null) {
-                    salidaDecorada.println("No se encontro a ningun vigilante con esa identificación.");
-                } else {
-                    salidaDecorada.println(parseToJSONUsuario(vig));
+                try {
+                    Vigilante vig = gestorUsuarios.buscarVigilante(codVi);
+                    if (vig == null) {
+                        salidaDecorada.println("No se encontro a ningun vigilante con esa identificación.");
+                    } else {
+                        salidaDecorada.println(parseToJSONUsuario(vig));
+                    }
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
                 }
+
             case "buscarVehPlaca":
                 String placaVeh = parametros[1];
-                Vehiculo vehiculo = gestorVehPersona.buscarVehPlaca(placaVeh);
-                if (vehiculo == null) {
-                    salidaDecorada.println("No se encontro vehiculo.");
-                } else {
-                    salidaDecorada.println(parseToJSONVehiculo(vehiculo));
+                Vehiculo vehiculo;
+                try {
+                    vehiculo = gestorVehPersona.buscarVehPlaca(placaVeh);
+                    if (vehiculo == null) {
+                        salidaDecorada.println("No se encontro vehiculo.");
+                    } else {
+                        salidaDecorada.println(parseToJSONVehiculo(vehiculo));
+                    }
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
                 }
+
                 break;
             case "registrarVigilante":
                 Vigilante vigilante;
@@ -287,8 +344,8 @@ public class servicioDB implements Runnable {
                 String empresaV = parametros[6];
                 String usuarioV = parametros[7];
                 String contraseniaV = parametros[8];
-                vigilante = gestorUsuarios.buscarVigilante(codV);
                 try {
+                    vigilante = gestorUsuarios.buscarVigilante(codV);
                     if (vigilante == null) {
                         gestorUsuarios.registrarVigilante(new Vigilante(codV, nombreV, apellidoV, generoV, fechaNacV, empresaV, usuarioV, contraseniaV));
                         salidaDecorada.println("Vigilante agregado con exito");
@@ -309,6 +366,66 @@ public class servicioDB implements Runnable {
                 } catch (Exception ex) {
                     salidaDecorada.println(ex.getMessage());
                 }
+                break;
+            case "registrarMulta":
+                String placaMul = parametros[1];
+                String mulDescripcion = parametros[2];
+                String mulfecha = parametros[3];
+                String mulfoto = parametros[4];
+                Vehiculo vehi;
+                try {
+                    vehi = gestorVehPersona.buscarVehPlaca(placaMul);
+                    if (vehi != null) {
+                        Multa objMulta = new Multa(placaMul, mulDescripcion, mulfecha, mulfoto);
+                        objMulta.getMulFecha();
+                        gestorVehPersona.regMultaVehiculo(objMulta);
+                        salidaDecorada.println("Multa agragada con exito.");
+                    } else {
+                        salidaDecorada.println("No se encontro vehiculo.");
+                    }
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
+                }
+                break;
+            case "verMultas":
+                placaVeh = parametros[1];
+                try {
+
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
+                }
+                ArrayList<Multa> objMulta = gestorVehPersona.verMultas(placaVeh);
+                if (objMulta == null) {
+                    salidaDecorada.println("No se encontro multas.");
+                } else {
+                    salidaDecorada.println(serializarMultas(objMulta));
+                }
+                break;
+            case "reporteIngreso":
+                try {
+                    ArrayList<Reporte> objReporte = gestorParqueadero.reporteIngreso();
+                    if (objReporte == null) {
+                        salidaDecorada.println("No se encontro reportes.");
+                    } else {
+                        salidaDecorada.println(serializarReporte(objReporte));
+                    }
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
+                }
+                break;
+            case "reporteIngresoVeh":
+                placaVeh = parametros[1];
+                try {
+                    ArrayList<Reporte> objreporte = gestorParqueadero.verReporte(placaVeh);
+                    if (objreporte == null) {
+                        salidaDecorada.println("No se encontro reporte.");
+                    } else {
+                        salidaDecorada.println(serializarReporteVeh(objreporte));
+                    }
+                } catch (Exception ex) {
+                    salidaDecorada.println(ex.getMessage());
+                }
+
                 break;
         }
     }
@@ -357,8 +474,61 @@ public class servicioDB implements Runnable {
             gsonObj = parseToJSONVehiculo(veh);
             array.add(gsonObj);
         }
-        //System.out.println("Vehiculos json serializado: " + array.toString());
         return array.toString();
+    }
+
+    private String serializarMultas(ArrayList<Multa> prmMultas) {
+        JsonArray array = new JsonArray();
+        JsonObject gsonObj;
+        for (Multa mul : prmMultas) {
+            gsonObj = parseToJSONMulta(mul);
+            array.add(gsonObj);
+        }
+        return array.toString();
+    }
+
+    private String serializarReporte(ArrayList<Reporte> prmReporte) {
+        JsonArray array = new JsonArray();
+        JsonObject gsonObj;
+        for (Reporte rep : prmReporte) {
+            gsonObj = parseToJsonReporte(rep);
+            array.add(gsonObj);
+        }
+        return array.toString();
+    }
+
+    private String serializarReporteVeh(ArrayList<Reporte> prmReporte) {
+        JsonArray array = new JsonArray();
+        JsonObject gsonObj;
+        for (Reporte re : prmReporte) {
+            gsonObj = parseToJSONReporteVeh(re);
+            array.add(gsonObj);
+        }
+        return array.toString();
+    }
+
+    private JsonObject parseToJSONReporteVeh(Reporte objReporte) {
+        JsonObject jsonobj = new JsonObject();
+        jsonobj.addProperty("cantidad", objReporte.getCantidad());
+        jsonobj.addProperty("fecha", objReporte.getFecha());
+        jsonobj.addProperty("placa", objReporte.getPlaca());
+        return jsonobj;
+    }
+
+    private JsonObject parseToJsonReporte(Reporte objReporte) {
+        JsonObject jsonobj = new JsonObject();
+        jsonobj.addProperty("numHoras", objReporte.getNumHoras());
+        jsonobj.addProperty("hora", objReporte.getHora());
+        return jsonobj;
+    }
+
+    private JsonObject parseToJSONMulta(Multa objMulta) {
+        JsonObject jsonobj = new JsonObject();
+        jsonobj.addProperty("vehPlaca", objMulta.getVehPlaca());
+        jsonobj.addProperty("mulDescripcion", objMulta.getMulDescripcion());
+        jsonobj.addProperty("mulFecha", objMulta.getMulFecha());
+        jsonobj.addProperty("mulFoto", objMulta.getMulFoto());
+        return jsonobj;
     }
 
     private JsonObject parseToJSONVehiculo(Vehiculo objVehiculo) {

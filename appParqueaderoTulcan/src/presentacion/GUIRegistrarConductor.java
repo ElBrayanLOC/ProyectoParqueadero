@@ -17,26 +17,28 @@ import negocio.Persona;
  */
 public class GUIRegistrarConductor extends javax.swing.JInternalFrame {
 
-    private int codCarne, identificacion;
+    private int codCarne, identificacion, cont;
     private String nombre, apellido, genero, fechaNacimiento, rol;
     private final GestorVehiculoPersona gestorVehPersona = new GestorVehiculoPersona();
+    private Date date;
 
     /**
      * Creates new form GUIRegPersona
      */
-    public GUIRegistrarConductor(int prmIdpersona,String tipo) {
+    public GUIRegistrarConductor(int prmIdpersona, String tipo) {
         initComponents();
         setVisible(true);
-        if(tipo.equals("carnet")){
-             codCarne = prmIdpersona;
-             txtCodCarne.setText(Integer.toString(prmIdpersona));
-             txtCodCarne.setEnabled(false);           
-        }else{
-             identificacion = prmIdpersona;
-             txtId.setText(Integer.toString(prmIdpersona));
-             txtId.setEnabled(false);           
+        mostarLabel();
+        if (tipo.equals("carnet")) {
+            codCarne = prmIdpersona;
+            txtCodCarne.setText(Integer.toString(prmIdpersona));
+            txtCodCarne.setEnabled(false);
+        } else {
+            identificacion = prmIdpersona;
+            txtId.setText(Integer.toString(prmIdpersona));
+            txtId.setEnabled(false);
         }
-       
+
     }
 
     /**
@@ -49,49 +51,45 @@ public class GUIRegistrarConductor extends javax.swing.JInternalFrame {
     private void initComponents() {
 
         pnlPrincipal = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        lbRegConductor = new javax.swing.JLabel();
         lbIdentificacion = new javax.swing.JLabel();
         txtId = new javax.swing.JTextField();
+        lbvid = new javax.swing.JLabel();
         lblCodCarne = new javax.swing.JLabel();
         txtCodCarne = new javax.swing.JTextField();
+        lbvcod = new javax.swing.JLabel();
         lbNombres = new javax.swing.JLabel();
         txtNombres = new javax.swing.JTextField();
+        lbvNom = new javax.swing.JLabel();
         lbApellidos = new javax.swing.JLabel();
         txtApellidos = new javax.swing.JTextField();
+        lbvape = new javax.swing.JLabel();
         lbGenero = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         rbFemenino = new javax.swing.JRadioButton();
         rbMasculino = new javax.swing.JRadioButton();
         rbOtro = new javax.swing.JRadioButton();
+        lbvgen = new javax.swing.JLabel();
         lbFecNacimiento = new javax.swing.JLabel();
         rSDateCalendar = new com.toedter.calendar.JDateChooser();
+        lbvfec = new javax.swing.JLabel();
         lbRol = new javax.swing.JLabel();
         cbRol = new javax.swing.JComboBox<>();
+        lbvrol = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         btnRegConductor = new javax.swing.JButton();
 
         setClosable(true);
         setMaximizable(true);
+        setTitle("Registro de Conductor");
 
-        pnlPrincipal.setBackground(new java.awt.Color(204, 204, 204));
-        pnlPrincipal.setLayout(new java.awt.GridLayout(17, 1));
-
-        jPanel4.setBackground(new java.awt.Color(51, 153, 255));
-        jPanel4.setLayout(new java.awt.GridLayout(1, 1));
-
-        lbRegConductor.setBackground(new java.awt.Color(0, 153, 255));
-        lbRegConductor.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
-        lbRegConductor.setForeground(new java.awt.Color(255, 255, 255));
-        lbRegConductor.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lbRegConductor.setText("Registro de Conductor");
-        jPanel4.add(lbRegConductor);
-
-        pnlPrincipal.add(jPanel4);
+        pnlPrincipal.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.light"));
+        pnlPrincipal.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Registro de Conductor UNICAUCA", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tw Cen MT", 1, 14))); // NOI18N
+        pnlPrincipal.setLayout(new java.awt.GridLayout(8, 3));
 
         lbIdentificacion.setBackground(new java.awt.Color(204, 204, 255));
         lbIdentificacion.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        lbIdentificacion.setText("Identificación");
+        lbIdentificacion.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbIdentificacion.setText("Identificación: ");
         pnlPrincipal.add(lbIdentificacion);
 
         txtId.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -101,22 +99,47 @@ public class GUIRegistrarConductor extends javax.swing.JInternalFrame {
         });
         pnlPrincipal.add(txtId);
 
-        lblCodCarne.setText("Código Carné");
+        lbvid.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvid.setForeground(new java.awt.Color(255, 0, 0));
+        lbvid.setText("Requerido");
+        pnlPrincipal.add(lbvid);
+
+        lblCodCarne.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        lblCodCarne.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblCodCarne.setText("Código Carné: ");
         pnlPrincipal.add(lblCodCarne);
         pnlPrincipal.add(txtCodCarne);
 
+        lbvcod.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvcod.setForeground(new java.awt.Color(255, 0, 0));
+        lbvcod.setText("Requerido");
+        pnlPrincipal.add(lbvcod);
+
         lbNombres.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        lbNombres.setText("Nombres");
+        lbNombres.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbNombres.setText("Nombres: ");
         pnlPrincipal.add(lbNombres);
         pnlPrincipal.add(txtNombres);
 
+        lbvNom.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvNom.setForeground(new java.awt.Color(255, 0, 0));
+        lbvNom.setText("Requerido");
+        pnlPrincipal.add(lbvNom);
+
         lbApellidos.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        lbApellidos.setText("Apellidos");
+        lbApellidos.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbApellidos.setText("Apellidos: ");
         pnlPrincipal.add(lbApellidos);
         pnlPrincipal.add(txtApellidos);
 
+        lbvape.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvape.setForeground(new java.awt.Color(255, 0, 0));
+        lbvape.setText("Requerido");
+        pnlPrincipal.add(lbvape);
+
         lbGenero.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        lbGenero.setText("Genero");
+        lbGenero.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbGenero.setText("Genero: ");
         pnlPrincipal.add(lbGenero);
 
         jPanel2.setLayout(new java.awt.GridLayout(1, 3));
@@ -133,17 +156,32 @@ public class GUIRegistrarConductor extends javax.swing.JInternalFrame {
 
         pnlPrincipal.add(jPanel2);
 
+        lbvgen.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvgen.setForeground(new java.awt.Color(255, 0, 0));
+        pnlPrincipal.add(lbvgen);
+
         lbFecNacimiento.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        lbFecNacimiento.setText("Fecha de Nacimiento");
+        lbFecNacimiento.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbFecNacimiento.setText("Fecha de Nacimiento: ");
         pnlPrincipal.add(lbFecNacimiento);
         pnlPrincipal.add(rSDateCalendar);
 
+        lbvfec.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvfec.setForeground(new java.awt.Color(255, 0, 0));
+        lbvfec.setText("Requerido");
+        pnlPrincipal.add(lbvfec);
+
         lbRol.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        lbRol.setText("Rol");
+        lbRol.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lbRol.setText("Rol: ");
         pnlPrincipal.add(lbRol);
 
         cbRol.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Estudiante", "Docente" }));
         pnlPrincipal.add(cbRol);
+
+        lbvrol.setFont(new java.awt.Font("Tw Cen MT Condensed", 1, 18)); // NOI18N
+        lbvrol.setForeground(new java.awt.Color(255, 0, 0));
+        pnlPrincipal.add(lbvrol);
         pnlPrincipal.add(jLabel1);
 
         btnRegConductor.setBackground(new java.awt.Color(204, 204, 255));
@@ -172,25 +210,26 @@ public class GUIRegistrarConductor extends javax.swing.JInternalFrame {
     private void btnRegConductorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegConductorActionPerformed
         // TODO add your handling code here:
         String confirmacion;
-        int id=getIdentificacion();
-        int codCarne = getCodCarne();
-        String nombre = getNombre();
-        String apellido = getApellido();
-        String genero = getGenero();
-        String fechaNacimiento = getFechaNacimiento();
-        String rol = getRol();
-        Persona conductor = gestorVehPersona.buscarUsuarioDocumento(id);
-        Persona cond= gestorVehPersona.buscarUsuarioCarne(codCarne);
-        if (conductor == null && cond==null) {
-            conductor = new Persona(identificacion, codCarne, nombre, apellido, genero, fechaNacimiento, rol);
-            confirmacion = gestorVehPersona.registrarConductor(conductor);
-            Utilidades.Utilidades.mensajeExito(confirmacion, "Registro Exitoso.");
-            this.dispose();
-        } else {
-            Utilidades.Utilidades.mensajeError("El Conductor con esa identificación o codigo de carne ya se encuentra registrado.", "Advertencia");
+        validarCampos();
+        if (getCont() == 0) {
+            int id = getIdentificacion();
+            int codCarne = getCodCarne();
+            String nombre = getNombre();
+            String apellido = getApellido();
+            String genero = getGenero();
+            String fechaNacimiento = getFechaNacimiento();
+            String rol = getRol();
+            Persona conductor = gestorVehPersona.buscarUsuarioDocumento(id);
+            Persona cond = gestorVehPersona.buscarUsuarioCarne(codCarne);
+            if (conductor == null && cond == null) {
+                conductor = new Persona(identificacion, codCarne, nombre, apellido, genero, fechaNacimiento, rol);
+                confirmacion = gestorVehPersona.registrarConductor(conductor);
+                Utilidades.Utilidades.mensajeExito(confirmacion, "Registro Exitoso.");
+                this.dispose();
+            } else {
+                Utilidades.Utilidades.mensajeError("El Conductor con esa identificación o codigo de carne ya se encuentra registrado.", "Advertencia");
+            }
         }
-
-
     }//GEN-LAST:event_btnRegConductorActionPerformed
     public int getCodCarne() {
         codCarne = Integer.parseInt(txtCodCarne.getText());
@@ -206,8 +245,9 @@ public class GUIRegistrarConductor extends javax.swing.JInternalFrame {
         apellido = txtApellidos.getText();
         return apellido;
     }
-    public int getIdentificacion(){
-        identificacion=Integer.parseInt(txtId.getText());
+
+    public int getIdentificacion() {
+        identificacion = Integer.parseInt(txtId.getText());
         return identificacion;
     }
 
@@ -225,7 +265,7 @@ public class GUIRegistrarConductor extends javax.swing.JInternalFrame {
     }
 
     public String getFechaNacimiento() {
-        Date date = rSDateCalendar.getDate();
+        date = rSDateCalendar.getDate();
         fechaNacimiento = DateFormat.getDateInstance().format(date);
         return fechaNacimiento;
     }
@@ -242,20 +282,72 @@ public class GUIRegistrarConductor extends javax.swing.JInternalFrame {
         return rol;
     }
 
+    public int getCont() {
+        return cont;
+    }
+
+    public void validarCampos() {
+        if(txtId.getText().equals("")){
+            lbvid.setVisible(true);
+            cont++;
+        }else{
+            lbvid.setVisible(false);
+        }
+        if(txtCodCarne.getText().equals("")){
+            lbvcod.setVisible(true);
+            cont++;
+        }else{
+            lbvcod.setVisible(false);
+        }
+        if (getNombre().equals("")) {
+            lbvNom.setVisible(true);
+            cont++;
+        } else {
+            lbvNom.setVisible(false);
+        }
+        if (getApellido().equals("")) {
+            lbvape.setVisible(true);
+            cont++;
+        } else {
+            lbvape.setVisible(false);
+        }
+        if(rSDateCalendar.getDate() == null){
+            lbvfec.setVisible(true);
+            cont++;
+        }else{
+            lbvfec.setVisible(false);
+        }
+    }
+
+    public void mostarLabel() {
+        lbvNom.setVisible(false);
+        lbvape.setVisible(false);
+        lbvcod.setVisible(false);
+        lbvfec.setVisible(false);
+        lbvgen.setVisible(false);
+        lbvid.setVisible(false);
+        lbvrol.setVisible(false);
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnRegConductor;
     private javax.swing.JComboBox<String> cbRol;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JLabel lbApellidos;
     private javax.swing.JLabel lbFecNacimiento;
     private javax.swing.JLabel lbGenero;
     private javax.swing.JLabel lbIdentificacion;
     private javax.swing.JLabel lbNombres;
-    private javax.swing.JLabel lbRegConductor;
     private javax.swing.JLabel lbRol;
     private javax.swing.JLabel lblCodCarne;
+    private javax.swing.JLabel lbvNom;
+    private javax.swing.JLabel lbvape;
+    private javax.swing.JLabel lbvcod;
+    private javax.swing.JLabel lbvfec;
+    private javax.swing.JLabel lbvgen;
+    private javax.swing.JLabel lbvid;
+    private javax.swing.JLabel lbvrol;
     private javax.swing.JPanel pnlPrincipal;
     private com.toedter.calendar.JDateChooser rSDateCalendar;
     private javax.swing.JRadioButton rbFemenino;

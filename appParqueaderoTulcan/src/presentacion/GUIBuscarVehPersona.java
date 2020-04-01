@@ -6,6 +6,7 @@
 package presentacion;
 
 import Utilidades.Utilidades;
+import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Observable;
@@ -18,12 +19,13 @@ import javax.swing.table.DefaultTableModel;
 import mvcf.AModel;
 import mvcf.AView;
 import negocio.*;
+import static presentacion.GUIInicio.dskEscritorio;
 
 /**
  *
  * @author Usuario
  */
-public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements Observer{
+public class GUIBuscarVehPersona extends javax.swing.JInternalFrame {
 
     private String accion;
     private String idPersona;
@@ -34,8 +36,8 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements O
 
     public GUIBuscarVehPersona() {
         initComponents();
-        cont=0;
-        tipoId="null";
+        cont = 0;
+        tipoId = "null";
     }
 
     /**
@@ -150,14 +152,25 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements O
 
             },
             new String [] {
-                "Placa", "Marca", "Tipo"
+                "Placa", "Marca", "Tipo", "Multas", "Reporte Multas"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, true, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         tblVehiculos.setShowHorizontalLines(false);
         tblVehiculos.setShowVerticalLines(false);
         tblVehiculos.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblVehiculosMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                tblVehiculosMousePressed(evt);
             }
         });
         jScrollPane2.setViewportView(tblVehiculos);
@@ -201,18 +214,20 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements O
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private boolean comprobarventana(Object obj){
-       
-        JInternalFrame[] activos= GUIInicio.dskEscritorio.getAllFrames();
+    private boolean comprobarventana(Object obj) {
+
+        JInternalFrame[] activos = GUIInicio.dskEscritorio.getAllFrames();
         boolean cerrado = true;
-        int i=0;
-        while(i<activos.length && cerrado){
-            if(activos[i] == obj)
+        int i = 0;
+        while (i < activos.length && cerrado) {
+            if (activos[i] == obj) {
                 cerrado = false;
-                i++;
-                       
-        } return cerrado;
-       
+            }
+            i++;
+
+        }
+        return cerrado;
+
     }
     private void txtNumeroIngresadoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtNumeroIngresadoFocusLost
         // TODO add your handling code here:
@@ -223,11 +238,11 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements O
                     String id = getDocumento();
                     ArrayList<Vehiculo> vehiculo = null;
                     int Id = Integer.parseInt(id);
-                    if (rbtCarnet.isSelected()){
+                    if (rbtCarnet.isSelected()) {
                         per = gestor.buscarUsuarioCarne(Id);
-                        tipoId="carnet";
-                    }else{
-                        tipoId="cedula";
+                        tipoId = "carnet";
+                    } else {
+                        tipoId = "cedula";
                         per = gestor.buscarUsuarioDocumento(Id);
                     }
                     vehiculo = gestor.BuscarVeh(Id);
@@ -236,55 +251,54 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements O
                         llenarPersona(per);
                         btnRegVehiculo.setEnabled(true);
                         btnAsignarPuesto.setEnabled(true);
-                    }else 
-                        if (per != null && vehiculo != null){
+                    } else if (per != null && vehiculo != null) {
                         llenarPersona(per);
                         llenarVehiculo(vehiculo);
                         btnAsignarPuesto.setEnabled(true);
-                    } else{
+                    } else {
                         Utilidades.mensajeAdvertencia("La consulta no arrojo datos", "Advertencia");
                         btnRegPersona.setEnabled(true);
                         btnRegVehiculo.setEnabled(true);
                         btnAsignarPuesto.setEnabled(false);
-                        limpiarTabla((DefaultTableModel)tblVehiculos.getModel());
-                        limpiarTabla((DefaultTableModel)tblinfUsuario.getModel());
+                        limpiarTabla((DefaultTableModel) tblVehiculos.getModel());
+                        limpiarTabla((DefaultTableModel) tblinfUsuario.getModel());
                     }
-                    if(tipoId.equals("carnet")){
+                    if (tipoId.equals("carnet")) {
                         per.setCodCarne(Id);
-                    }else{
+                    } else {
                         per.setPerIdentificacion(Id);
-                        
+
                     }
                 }
             }
-            
+
         } catch (Exception e) {
-        }  
+        }
     }//GEN-LAST:event_txtNumeroIngresadoFocusLost
 
     private void btnRegPersonaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegPersonaActionPerformed
         int doc = Integer.parseInt(getDocumento());
-        String tipo=getTipoId();
-        GUIRegistrarConductor objRegConductor = new GUIRegistrarConductor(doc,tipo);
+        String tipo = getTipoId();
+        GUIRegistrarConductor objRegConductor = new GUIRegistrarConductor(doc, tipo);
         GUIInicio.dskEscritorio.add(objRegConductor);
         objRegConductor.toFront();
         objRegConductor.setVisible(true);
         objRegConductor.setMaximizable(true);
         btnRegPersona.setEnabled(false);
         cont++;
-        if(cont==2){
+        if (cont == 2) {
             btnAsignarPuesto.setEnabled(true);
-            cont=0;
+            cont = 0;
         }
     }//GEN-LAST:event_btnRegPersonaActionPerformed
 
     private void btnRegVehiculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegVehiculoActionPerformed
         // TODO add your handling code here:
         GestorVehiculoPersona gestor = new GestorVehiculoPersona();
-        if(getTipoId().equals("carnet")){
-            per=gestor.buscarUsuarioCarne(Integer.parseInt(getDocumento()));
-        }else{
-            per= gestor.buscarUsuarioDocumento(Integer.parseInt(getDocumento()));
+        if (getTipoId().equals("carnet")) {
+            per = gestor.buscarUsuarioCarne(Integer.parseInt(getDocumento()));
+        } else {
+            per = gestor.buscarUsuarioDocumento(Integer.parseInt(getDocumento()));
         }
         GUIRegistrarVehiculo objRegVehiculo = new GUIRegistrarVehiculo(per.getPerIdentificacion(), per.getCodCarne());
         GUIInicio.dskEscritorio.add(objRegVehiculo);
@@ -293,41 +307,82 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements O
         objRegVehiculo.setMaximizable(true);
         btnRegVehiculo.setEnabled(false);
         cont++;
-         if(cont==2){
+        if (cont == 2) {
             btnAsignarPuesto.setEnabled(true);
-            cont=0;
+            cont = 0;
         }
     }//GEN-LAST:event_btnRegVehiculoActionPerformed
 
     private void btnAsignarPuestoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAsignarPuestoActionPerformed
-        if(placa==null){
+        if (placa == null) {
             Utilidades.mensajeAdvertencia("Se debe seleccionar el vehiculo a parquear", "Advertencia");
-        }else{
-            GestorVehiculoPersona gestor = new GestorVehiculoPersona();
-            String id = getDocumento();
-            Persona per = null;
-            ArrayList<Vehiculo> vehiculo = null;
-            int Id = Integer.parseInt(id);
-            per = gestor.buscarUsuarioDocumento(Id);
-            if (per != null && vehiculo != null){
-                llenarPersona(per);
-                llenarVehiculo(vehiculo);
+        } else {
+            GUIVerMapa objVerMapa = null;
+            try {
+                objVerMapa = new GUIVerMapa(1, placa);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(GUIBuscarVehPersona.class.getName()).log(Level.SEVERE, null, ex);
             }
-            GUIVerMapa objVerMapa = new GUIVerMapa(1,placa);
             GUIInicio.dskEscritorio.add(objVerMapa);
             objVerMapa.toFront();
             objVerMapa.setVisible(true);
             objVerMapa.setMaximizable(false);
-               
-            
         }
-      
     }//GEN-LAST:event_btnAsignarPuestoActionPerformed
 
     private void tblVehiculosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVehiculosMouseClicked
-      int seleccionar=tblVehiculos.rowAtPoint(evt.getPoint());
-      placa=String.valueOf(tblVehiculos.getValueAt(seleccionar, 0));
+        int column = tblVehiculos.getColumnModel().getColumnIndexAtX(evt.getX());
+        int row = evt.getY()/tblVehiculos.getRowHeight();
+        if(row < tblVehiculos.getRowCount() && row >= 0 && column < tblVehiculos.getColumnCount() && column >=0 ){
+            Object value = tblVehiculos.getValueAt(row, column);
+            if(value instanceof JButton){
+                ((JButton)value).doClick();
+                JButton btn = (JButton) value;
+                if(btn.getName().equals("m")){
+                    verMultas();
+                }else{
+                   verReporte();
+                }
+            }
+        }
     }//GEN-LAST:event_tblVehiculosMouseClicked
+    public void verReporte(){
+        GUIReporteIngreso objReporte = new GUIReporteIngreso(placa);
+        
+        if(objReporte.verReporte(placa)){
+            GUIReporteIngreso objReport = new GUIReporteIngreso(placa);
+            objReport.setMaximizable(true);
+            dskEscritorio.add(objReport);
+            try {
+                objReport.setMaximum(false);
+            } catch (PropertyVetoException ex) {
+                Logger.getLogger(GUIInicio.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            objReport.show();
+            
+        }else{
+            Utilidades.mensajeAdvertencia("El vehiculo no tiene ingreso registrados en las ultimas dos semanas", "Advertencia");
+        }
+        
+       
+    }
+    public void verMultas(){
+        GUIVerMultas objMulta = new GUIVerMultas(placa);
+        objMulta.setMaximizable(true);
+        dskEscritorio.add(objMulta);
+        try {
+            objMulta.setMaximum(false);
+        } catch (PropertyVetoException ex) {
+            Logger.getLogger(GUIInicio.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        objMulta.show();
+    }
+    private void tblVehiculosMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblVehiculosMousePressed
+        // TODO add your handling code here:
+        int seleccionar = tblVehiculos.rowAtPoint(evt.getPoint());
+        placa = String.valueOf(tblVehiculos.getValueAt(seleccionar, 0));
+        System.out.println(placa);
+    }//GEN-LAST:event_tblVehiculosMousePressed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup GrupoBotones;
@@ -350,9 +405,9 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements O
     private javax.swing.JTextField txtNumeroIngresado;
     // End of variables declaration//GEN-END:variables
 
-
     public void llenarPersona(Persona objPersona) {
         //limpiarTabla(model);
+        JButton btnVerMulta = new JButton();
         DefaultTableModel model = (DefaultTableModel) tblinfUsuario.getModel();
         limpiarTabla(model);
         for (int i = 0; i < tblinfUsuario.getRowCount(); i++) {
@@ -369,11 +424,18 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements O
     public void llenarVehiculo(ArrayList<Vehiculo> vehiculos) {
         DefaultTableModel model = (DefaultTableModel) tblVehiculos.getModel();
         limpiarTabla(model);
-        Object rowData[] = new Object[3];
+        tblVehiculos.setDefaultRenderer(Object.class, new Render());
+        JButton btnVerMultas = new JButton("ver Multas");
+        btnVerMultas.setName("m");
+        JButton btnRepMultas = new JButton("Reporte Ingreso");
+        btnRepMultas.setName("r");
+        Object rowData[] = new Object[5];
         for (Vehiculo veh : vehiculos) {
             rowData[0] = veh.getVehPlaca();
             rowData[1] = veh.getVehMarca();
             rowData[2] = veh.getVehTipo();
+            rowData[3] = btnVerMultas;
+            rowData[4] = btnRepMultas;
             model.addRow(rowData);
         }
     }
@@ -382,7 +444,7 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements O
         idPersona = txtNumeroIngresado.getText();
         return idPersona;
     }
-    
+
     public void setAccion(String accion) {
         this.accion = accion;
     }
@@ -402,7 +464,6 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements O
     public void setTipoId(String tipoId) {
         this.tipoId = tipoId;
     }
-    
 
     public boolean validarFormulario() {
         boolean band = true;
@@ -428,12 +489,4 @@ public class GUIBuscarVehPersona extends javax.swing.JInternalFrame implements O
             objTabla.removeRow(0);
         }
     }
-
-    @Override
-    public void update(Observable obs, Object arg) {
-        GestorVehiculoPersona objVeh = (GestorVehiculoPersona)obs;
-        llenarPersona(per);
-    }
-    
-
 }
